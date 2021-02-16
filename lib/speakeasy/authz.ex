@@ -70,6 +70,9 @@ defmodule Speakeasy.Authz do
 
   @doc false
   def default_error_message() do
-    Application.get_env(:speakeasy, :authz_error_message)
+    Speakeasy.Utils.Map.deep_merge(
+      Application.get_env(:speakeasy, :authz_error_message),
+      %{extensions: %{timestamp: to_string(DateTime.utc_now())}}
+    )
   end
 end
