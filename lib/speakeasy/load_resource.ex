@@ -64,7 +64,7 @@ defmodule Speakeasy.LoadResource do
         Absinthe.Resolution.put_result(res, {:error, reason})
 
       nil ->
-        Absinthe.Resolution.put_result(res, {:error, :not_found})
+        Absinthe.Resolution.put_result(res, {:error, default_error_message()})
 
       ref ->
         raise UnexpectedLoadingResponse,
@@ -81,4 +81,12 @@ defmodule Speakeasy.LoadResource do
   defp get_resource(fun, args, user, _ctx) when is_function(fun, 2), do: fun.(args, user)
   defp get_resource(fun, args, _user, _ctx) when is_function(fun, 1), do: fun.(args)
   defp get_resource(fun, _args, _user, _ctx) when is_function(fun, 0), do: fun.()
+
+  @doc false
+  def default_error_message() do
+    Speakeasy.Utils.Map.deep_merge(
+      Application.get_env(:speakeasy, :resource_not_found),
+      %{extensions: %{timestamp: to_string(DateTime.utc_now())}}
+    )
+  end
 end
